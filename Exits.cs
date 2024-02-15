@@ -8,8 +8,9 @@ public class Exits : MonoBehaviour
     
     
     
-    OnTriggerEnter(Collider other)
+   /* OnTriggerEnter(Collider other)
     {
         EditorSceneManager.LoadScene("Scene2");
-    }
+        
+    } */
 }

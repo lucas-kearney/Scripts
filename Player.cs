@@ -10,11 +10,22 @@ public class Player : MonoBehaviour
    private float movementX;
     private float movementY;
     public float speed = 0;
+    public GameObject northExit;
+    public GameObject southExit;
+    public GameObject eastExit;
+    public GameObject westExit;
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent <Rigidbody>();
         print("You are now in room one");
+        if(!MySingleton.currentDirection.Equals("?"))
+        {
+            if(MySingleton.currentDirection.Equals("North Exit"))
+            {
+                this.gameObject.transform.position = this.southExit.transform.position;
+            }
+        }
     }
 
 
@@ -22,7 +33,11 @@ public class Player : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
-        //EditorSceneManager.LoadScene("Scene2");
+       if(other.CompareTag("exit"))
+       {
+         MySingleton.currentDirection = "North Exit";
+         EditorSceneManager.LoadScene("Scene2");
+       }
         
     }
 
