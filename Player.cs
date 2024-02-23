@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.SceneManagement;
 
+
 public class Player : MonoBehaviour
 {
     public GameObject northExit;
@@ -12,6 +13,10 @@ public class Player : MonoBehaviour
     private float speed = 5.0f;
     private bool amMoving = false;
     private bool amAtMiddleOfRoom = false;
+    private GameObject[] triggers;
+    private int randomExits;
+
+    
 
     private void turnOffExits()
     {
@@ -33,7 +38,13 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        triggers = new GameObject[] { northExit, southExit, eastExit, westExit };
         //disable all exits when the scene first loads
+        triggers = GameObject.FindGameObjectsWithTag("exit");
+
+        Debug.Log("Number of exit triggers found: " + triggers.Length);
+        
         this.turnOffExits();
 
         //not our first scene
@@ -55,14 +66,19 @@ public class Player : MonoBehaviour
             {
                 this.gameObject.transform.position = this.westExit.transform.position;
             }
+
+            
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Trigger entered: " + other.gameObject.name);
+        
         if(other.CompareTag("exit"))
         {
             EditorSceneManager.LoadScene("Scene1");
+            DeactivateRandomTriggers();
         }
         else if(other.CompareTag("middleOfTheRoom") && !MySingleton.currentDirection.Equals("?"))
         {
@@ -72,6 +88,41 @@ public class Player : MonoBehaviour
 
         
     }
+
+
+    public void DeactivateRandomTriggers()
+{
+    ShuffleArray(triggers);
+    randomExits = UnityEngine.Random.Range(0, triggers.Length);
+    Debug.Log("Random exits: " + randomExits);
+    for (int i = 0; i < randomExits; i++)
+    {
+        if (i < triggers.Length && triggers[i] != null)
+        {
+            triggers[i].SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("Skipping null or out-of-bounds trigger at index " + i);
+            Debug.Log("Triggers length: " + triggers.Length);
+            Debug.Log("Trigger at index " + i + ": " + (triggers[i] == null ? "null" : triggers[i].name));
+        }
+    }
+}
+    
+
+    // Method to shuffle the elements of an array
+    private void ShuffleArray<T>(T[] array)
+{
+    for (int i = array.Length - 1; i >= 0; i--)
+    {
+        int randomIndex = UnityEngine.Random.Range(0, i + 1);
+        T temp = array[i];
+        array[i] = array[randomIndex];
+        array[randomIndex] = temp;
+        Debug.Log("The Deactivated exits are: " + array);
+    }
+}
 
     // Update is called once per frame
     void Update()
