@@ -1,16 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor.SceneManagement;
 
-public class Exits : MonoBehaviour
+public class Exit 
 {
-    
-    
-    
-   /* OnTriggerEnter(Collider other)
+    private string direction;
+    private Room destinationRoom;
+
+    public Exit(string direction, Room destinationRoom)
     {
-        EditorSceneManager.LoadScene("Scene2");
-        
-    } */
+        this.direction = direction;
+        this.destinationRoom = destinationRoom;
+    }
+
+    public string getDirection()
+    {
+        return this.direction;
+    }
+
+    public Room GetDestinationRoom()
+    {
+        return destinationRoom;
+    }
 }
