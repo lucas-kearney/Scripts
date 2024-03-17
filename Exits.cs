@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Exit 
+public class Exit
 {
     private string direction;
     private Room destinationRoom;
@@ -13,13 +13,13 @@ public class Exit
         this.destinationRoom = destinationRoom;
     }
 
+    public Room getDestinationRoom()
+    {
+        return this.destinationRoom;
+    }
+
     public string getDirection()
     {
         return this.direction;
-    }
-
-    public Room GetDestinationRoom()
-    {
-        return destinationRoom;
     }
 }

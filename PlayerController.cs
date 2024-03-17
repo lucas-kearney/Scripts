@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.SceneManagement;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class PlayerController : MonoBehaviour
     private float speed = 5.0f;
     private bool amMoving = false;
     private bool amAtMiddleOfRoom = false;
+    public TextMeshProUGUI countText;
+    private int count = MySingleton.count;
+    
 
     private void turnOffExits()
     {
@@ -31,6 +35,12 @@ public class PlayerController : MonoBehaviour
         this.westExit.gameObject.SetActive(true);
     }
 
+    void SetCountText() 
+   {
+       countText.text =  "Count: " + count.ToString();
+       count++;
+   }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -38,7 +48,11 @@ public class PlayerController : MonoBehaviour
 
         //disable all exits when the scene first loads
         this.turnOffExits();
-
+        if(count == 0)
+        {
+            this.SetCountText();
+        }
+        
         //disable the middle collider until we know what our initial state will be
         //it should already be disabled by default, but for clarity, lets do it here
         this.middleOfTheRoom.SetActive(false);
@@ -47,8 +61,6 @@ public class PlayerController : MonoBehaviour
         {
             //mark ourselves as moving since we are entering the scene through one of the exits
             this.amMoving = true;
-            Room startRoom = MySingleton.theDungeon.GetStartRoom();
-            MySingleton.thePlayer.setCurrentRoom(startRoom);
 
             //we will be positioning the player by one of the exits so we can turn on the middle collider
             this.middleOfTheRoom.SetActive(true);
@@ -106,10 +118,16 @@ public class PlayerController : MonoBehaviour
         if(other.CompareTag("exit"))
         {
             print("Loading scene");
-            
-            EditorSceneManager.LoadScene("Scene1");
 
-            
+            //remove the player from the current room and place him into the destination, prior to loading the new scene
+            MySingleton.thePlayer.getCurrentRoom().removePlayer(MySingleton.currentDirection);
+
+            EditorSceneManager.LoadScene("Scene1");
+        }
+        else if(other.CompareTag("pickup"))
+        {
+            other.gameObject.SetActive(false); //make pellet disappear
+            SetCountText();
         }
         else if(other.CompareTag("middleOfTheRoom") && !MySingleton.currentDirection.Equals("?"))
         {

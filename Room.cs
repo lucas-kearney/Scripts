@@ -5,6 +5,7 @@ using UnityEngine;
 public class Room
 {
     private string name;
+    
 
     private Exit[] theExits = new Exit[4];
     private int howManyExits = 0;
@@ -19,7 +20,29 @@ public class Room
     public void addPlayer(Player thePlayer)
     {
         this.currentPlayer = thePlayer;
-        this.currentPlayer.setCurrentRoom(this);
+        this.currentPlayer.setCurrentRoom(this); //this updates the player to their new current room
+    }
+
+    //remove the current player from this room
+    public void removePlayer(string direction)
+    {
+        Exit theExit = this.getExitGivenDirection(direction);
+        Room destinationRoom = theExit.getDestinationRoom();
+        destinationRoom.addPlayer(this.currentPlayer);
+        this.currentPlayer = null; //finally remove the player that just left from this room
+
+    }
+
+    private Exit getExitGivenDirection(string direction)
+    {
+        for (int i = 0; i < this.howManyExits; i++)
+        {
+            if (this.theExits[i].getDirection().Equals(direction))
+            {
+                return this.theExits[i]; //returns the exit in the given direction
+            }
+        }
+        return null; //never found the exit
     }
 
     public bool hasExit(string direction)
