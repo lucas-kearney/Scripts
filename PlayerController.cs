@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.SceneManagement;
 using TMPro;
+using UnityEngine.SceneManagement;
+
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,11 +13,13 @@ public class PlayerController : MonoBehaviour
     public GameObject eastExit;
     public GameObject westExit;
     public GameObject middleOfTheRoom;
+    public GameObject Scene2Middle;
     private float speed = 5.0f;
     private bool amMoving = false;
     private bool amAtMiddleOfRoom = false;
     public TextMeshProUGUI countText;
     private int count = MySingleton.count;
+    private string sceneName = "Scene1";
     
 
     private void turnOffExits()
@@ -45,7 +49,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         //Rigidbody rb = this.gameObject.GetComponent<Rigidbody>();
-
+        GetSceneByName("Scene1");
         //disable all exits when the scene first loads
         this.turnOffExits();
         if(count == 0)
@@ -112,7 +116,21 @@ public class PlayerController : MonoBehaviour
 
     }
     */
-
+    public static Scene GetSceneByName(string sceneName)
+    {
+        if (SceneUtility.GetBuildIndexByScenePath(sceneName) != -1)
+        {
+            // Scene exists, load it
+            return SceneManager.GetSceneByName(sceneName);
+        }
+        else
+        {
+            // Scene doesn't exist
+            return default(Scene);
+        }
+    }
+   
+   
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("exit"))
@@ -141,6 +159,14 @@ public class PlayerController : MonoBehaviour
             this.amMoving = false;
             MySingleton.currentDirection = "middle";
         }
+        else if(other.CompareTag("monster"))
+        {
+            DontDestroyOnLoad(gameObject);
+            GetSceneByName("Scene2");
+            EditorSceneManager.LoadScene("Scene2");
+            this.gameObject.transform.position = Vector3.MoveTowards(this.gameObject.transform.position, this.Scene2Middle.transform.position, this.speed * Time.deltaTime);
+
+        }
         else
         {
             print("spomethilskdfjskldjfsdjkl");
@@ -150,6 +176,9 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+         Scene currentScene = SceneManager.GetActiveScene();
+       if(currentScene.name == "Scene1")
+       {
         if (Input.GetKeyUp(KeyCode.UpArrow) && !this.amMoving && MySingleton.thePlayer.getCurrentRoom().hasExit("north"))
         {
             this.amMoving = true;
@@ -203,5 +232,16 @@ public class PlayerController : MonoBehaviour
         {
             this.gameObject.transform.position = Vector3.MoveTowards(this.gameObject.transform.position, this.eastExit.transform.position, this.speed * Time.deltaTime);
         }
+        else if (currentScene.name == "Scene2")
+    {
+        // Your Scene2 specific code here
+
+        // Example:
+        // if (Input.GetKeyDown(KeyCode.Space))
+        // {
+        //     // Do something specific to Scene2
+        // }
+    }
+       }
     }
 }
