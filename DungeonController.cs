@@ -5,64 +5,64 @@ using UnityEngine;
 public class DungeonController : MonoBehaviour
 {
     public GameObject northDoor, southDoor, eastDoor, westDoor;
-    public GameObject northPickup, southPickup, westPickup, eastPickup;
+    public GameObject northPellet, southPellet, eastPellet, westPellet;
 
     void Start()
     {
-        Room theCurrentRoom = MySingleton.thePlayer.getCurrentRoom();
+        this.setDoors();
+        this.setPellets();
+    }
 
-        turnOffPickup();
-        if(theCurrentRoom.hasExit("north"))
+    //all doors are on by default, so turn off the doors that should not be there.
+    private void setDoors()
+    {
+        Room theCurrentRoom = MySingleton.thePlayer.getCurrentRoom();
+        if (theCurrentRoom.hasExit("north"))
         {
             this.northDoor.SetActive(false);
-            this.northPickup.gameObject.SetActive(true);
-        }
-        else
-        {
-            this.northDoor.SetActive(true);
+
         }
 
         if (theCurrentRoom.hasExit("south"))
         {
             this.southDoor.SetActive(false);
-            this.southPickup.gameObject.SetActive(true);
-        }
-        else
-        {
-            this.southDoor.SetActive(true);
         }
 
         if (theCurrentRoom.hasExit("east"))
         {
             this.eastDoor.SetActive(false);
-            this.eastPickup.gameObject.SetActive(true);
-        }
-        else
-        {
-            this.eastDoor.SetActive(true);
         }
 
         if (theCurrentRoom.hasExit("west"))
         {
             this.westDoor.SetActive(false);
-            this.westPickup.gameObject.SetActive(true);
         }
-        else
-        {
-            this.westDoor.SetActive(true);
-        }
-        
     }
 
-    public void turnOffPickup()
+    //all pellets are on by default, so turn off the ones that shouldnt be there
+    private void setPellets()
     {
-    this.northPickup.gameObject.SetActive(false);
-    this.southPickup.gameObject.SetActive(false);
-    this.westPickup.gameObject.SetActive(false);
-    this.eastPickup.gameObject.SetActive(false);
+        Room theCurrentRoom = MySingleton.thePlayer.getCurrentRoom();
+        if (!theCurrentRoom.hasPellet("north"))
+        {
+            this.northPellet.SetActive(false);
+
+        }
+        if (!theCurrentRoom.hasPellet("south"))
+        {
+            this.southPellet.SetActive(false);
+        }
+
+        if (!theCurrentRoom.hasPellet("east"))
+        {
+            this.eastPellet.SetActive(false);
+        }
+
+        if (!theCurrentRoom.hasPellet("west"))
+        {
+            this.westPellet.SetActive(false);
+        }
     }
-
-
     // Update is called once per frame
     void Update()
     {

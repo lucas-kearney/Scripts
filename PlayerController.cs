@@ -2,9 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor.SceneManagement;
-using TMPro;
-using UnityEngine.SceneManagement;
-
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,14 +10,9 @@ public class PlayerController : MonoBehaviour
     public GameObject eastExit;
     public GameObject westExit;
     public GameObject middleOfTheRoom;
-    public GameObject Scene2Middle;
     private float speed = 5.0f;
     private bool amMoving = false;
     private bool amAtMiddleOfRoom = false;
-    public TextMeshProUGUI countText;
-    private int count = MySingleton.count;
-    private string sceneName = "Scene1";
-    
 
     private void turnOffExits()
     {
@@ -39,24 +31,14 @@ public class PlayerController : MonoBehaviour
         this.westExit.gameObject.SetActive(true);
     }
 
-    void SetCountText() 
-   {
-       countText.text =  "Count: " + count.ToString();
-       count++;
-   }
-
     // Start is called before the first frame update
     void Start()
     {
         //Rigidbody rb = this.gameObject.GetComponent<Rigidbody>();
-        GetSceneByName("Scene1");
+
         //disable all exits when the scene first loads
         this.turnOffExits();
-        if(count == 0)
-        {
-            this.SetCountText();
-        }
-        
+
         //disable the middle collider until we know what our initial state will be
         //it should already be disabled by default, but for clarity, lets do it here
         this.middleOfTheRoom.SetActive(false);
@@ -116,21 +98,7 @@ public class PlayerController : MonoBehaviour
 
     }
     */
-    public static Scene GetSceneByName(string sceneName)
-    {
-        if (SceneUtility.GetBuildIndexByScenePath(sceneName) != -1)
-        {
-            // Scene exists, load it
-            return SceneManager.GetSceneByName(sceneName);
-        }
-        else
-        {
-            // Scene doesn't exist
-            return default(Scene);
-        }
-    }
-   
-   
+
     private void OnTriggerEnter(Collider other)
     {
         if(other.CompareTag("exit"))
@@ -144,13 +112,23 @@ public class PlayerController : MonoBehaviour
         }
         else if(other.CompareTag("pickup"))
         {
-            other.gameObject.SetActive(false); //make pellet disappear
-            SetCountText();
+            //EditorSceneManager.LoadScene("Scene2");
+
+            other.gameObject.SetActive(false); //visually make pellet disappear
+
+            //programatically  make sure the pellet doesnt show up again
+            Room theCurrentRoom = MySingleton.thePlayer.getCurrentRoom();
+            theCurrentRoom.removePellet(other.GetComponent<pelletController>().direction); //this is our code to fix the pellet...add ; to end of this line for error to go away
+
+           
+
+
         }
         else if(other.CompareTag("middleOfTheRoom") && !MySingleton.currentDirection.Equals("?"))
         {
             //we have hit the middle of the room, so lets turn off the collider
             //until the next run of the scene to avoid additional collisions
+
             this.middleOfTheRoom.SetActive(false);
             this.turnOnExits();
 
@@ -158,14 +136,6 @@ public class PlayerController : MonoBehaviour
             this.amAtMiddleOfRoom = true;
             this.amMoving = false;
             MySingleton.currentDirection = "middle";
-        }
-        else if(other.CompareTag("monster"))
-        {
-            DontDestroyOnLoad(gameObject);
-            GetSceneByName("Scene2");
-            EditorSceneManager.LoadScene("Scene2");
-            this.gameObject.transform.position = Vector3.MoveTowards(this.gameObject.transform.position, this.Scene2Middle.transform.position, this.speed * Time.deltaTime);
-
         }
         else
         {
@@ -176,9 +146,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-         Scene currentScene = SceneManager.GetActiveScene();
-       if(currentScene.name == "Scene1")
-       {
         if (Input.GetKeyUp(KeyCode.UpArrow) && !this.amMoving && MySingleton.thePlayer.getCurrentRoom().hasExit("north"))
         {
             this.amMoving = true;
@@ -232,16 +199,5 @@ public class PlayerController : MonoBehaviour
         {
             this.gameObject.transform.position = Vector3.MoveTowards(this.gameObject.transform.position, this.eastExit.transform.position, this.speed * Time.deltaTime);
         }
-        else if (currentScene.name == "Scene2")
-    {
-        // Your Scene2 specific code here
-
-        // Example:
-        // if (Input.GetKeyDown(KeyCode.Space))
-        // {
-        //     // Do something specific to Scene2
-        // }
-    }
-       }
     }
 }
